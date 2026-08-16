@@ -1,0 +1,35 @@
+# Prometheus configuration
+# Refs:
+#   - https://prometheus.io/docs/prometheus/latest/configuration/configuration/
+#   - https://prometheus.io/docs/prometheus/latest/getting_started/
+#
+# This file is bind-mounted into the container at /etc/prometheus/prometheus.yml
+# (see docker-compose.yaml). Edit it, then reload without a restart via:
+#   curl -X POST http://localhost:9090/-/reload
+
+global:
+  scrape_interval: 15s          # default scrape cadence
+  evaluation_interval: 15s      # default rule evaluation cadence
+  external_labels:
+    monitor: "prometheus-and-grafana-observability"
+
+# Alertmanager is not deployed yet; leave the placeholder for future use.
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+# Recording / alerting rule files (none yet).
+rule_files:
+  # - "rules/*.yml"
+
+scrape_configs:
+  # Self-monitoring: Prometheus scrapes its own metrics endpoint.
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # Grafana exposes a Prometheus-compatible metrics endpoint at /metrics.
+  - job_name: "grafana"
+    static_configs:
+      - targets: ["grafana:3000"]
